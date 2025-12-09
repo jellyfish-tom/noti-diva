@@ -48,7 +48,7 @@ export class MessageDisplay {
   private statusResetTimers: Record<string, number> = {};
   private registeredTargets: Map<string, MessageTarget> = new Map();
 
-  register(elementId: string, config: MessageTargetConfig = {}): MessageTarget {
+  for(elementId: string, config: MessageTargetConfig = {}): MessageTarget {
     if (this.registeredTargets.has(elementId)) {
       return this.registeredTargets.get(elementId)!;
     }
@@ -62,10 +62,6 @@ export class MessageDisplay {
     const target = new MessageTarget(this, elementId, defaultConfig);
     this.registeredTargets.set(elementId, target);
     return target;
-  }
-
-  for(elementId: string, config: MessageTargetConfig = {}): MessageTarget {
-    return this.register(elementId, config);
   }
 
   show(message: string, type: StatusType, options: MessageDisplayOptions = {}): void {

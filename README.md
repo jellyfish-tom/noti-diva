@@ -4,13 +4,13 @@ Framework-agnostic message display library with floating and fixed message suppo
 
 ## Features
 
-- 🎯 **Framework-agnostic** - Works with any framework or vanilla JS
-- 🎨 **Flexible display modes** - Floating or fixed messages
-- 🔧 **Type-safe** - Full TypeScript support
-- ⚡ **Simple API** - Clean, intuitive methods
-- 🎭 **React hooks** - Optional React integration
-- 🎪 **Animated** - Beautiful floating animations
-- 📦 **Zero dependencies** - Only requires `ts-pattern` as peer dependency
+🎯 **Framework-agnostic** - Works with any framework or vanilla JS
+🎨 **Flexible display modes** - Floating or fixed messages
+🔧 **Type-safe** - Full TypeScript support
+⚡ **Simple API** - Clean, intuitive methods
+🎭 **React hooks** - Optional React integration
+🎪 **Animated** - Beautiful floating animations
+📦 **Zero dependencies** - Only requires `ts-pattern` as peer dependency
 
 ## Installation
 
@@ -26,8 +26,8 @@ npm install noti-diva ts-pattern
 import { messageDisplay } from "noti-diva";
 import "noti-diva/dist/styles.css";
 
-// Register a target once
-const editorStatus = messageDisplay.register("editor-status", {
+// Create a target once
+const editorStatus = messageDisplay.for("editor-status", {
   floating: false,
   duration: 3000,
 });
@@ -70,24 +70,16 @@ The hook returns an object with methods: `success`, `error`, `warning`, `info`, 
 
 ## API
 
-### `messageDisplay.register(elementId, config?)`
+### `messageDisplay.for(elementId, config?)`
 
-Register a message target with configuration. Returns the same target if already registered.
+Create (or retrieve) a message target with configuration. Returns the same target if already registered.
 
 ```typescript
-const status = messageDisplay.register("my-status", {
+const status = messageDisplay.for("my-status", {
   floating: false, // Default: true
   duration: 3000, // Default: 3000ms
   container: document.body, // Default: document.body
 });
-```
-
-### `messageDisplay.for(elementId, config?)`
-
-Alias for `register()`. Provides a more fluent API:
-
-```typescript
-const status = messageDisplay.for("my-status", { floating: false });
 ```
 
 ### `MessageTarget` Methods
@@ -110,7 +102,6 @@ All methods accept an optional `overrides` parameter to temporarily override the
 - `messageDisplay.neutral(message, options?)`
 - `messageDisplay.show(message, type, options?)`
 - `messageDisplay.showInline(message, type, container, options?)` - Display inline message in a container
-- `messageDisplay.for(elementId, config?)` - Alias for `register()`
 
 ## Configuration
 
@@ -156,7 +147,7 @@ You can customize the styles by overriding the CSS classes:
 ```typescript
 import { messageDisplay } from "noti-diva";
 
-const editorStatus = messageDisplay.register("editor-status", {
+const editorStatus = messageDisplay.for("editor-status", {
   floating: false,
 });
 

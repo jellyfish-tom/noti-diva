@@ -29,9 +29,13 @@
     "author": "",
     "license": "ISC",
     "peerDependencies": {
-        "ts-pattern": "^5.0.0"
+        "react": "^16.8.0 || ^17.0.0 || ^18.0.0",
+        "ts-pattern": "^5.9.0"
     },
     "peerDependenciesMeta": {
+        "react": {
+            "optional": true
+        },
         "ts-pattern": {
             "optional": false
         }
@@ -39,14 +43,7 @@
     "devDependencies": {
         "@types/node": "^20.11.24",
         "@types/react": "^18.0.0",
+        "ts-pattern": "^5.9.0",
         "typescript": "^5.9.2"
-    },
-    "peerDependencies": {
-        "react": "^16.8.0 || ^17.0.0 || ^18.0.0"
-    },
-    "peerDependenciesMeta": {
-        "react": {
-            "optional": true
-        }
     }
 }

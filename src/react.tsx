@@ -5,7 +5,7 @@ import { messageDisplay } from "./message-display";
 import type { MessageTargetConfig } from "./types";
 
 export function useMessageDisplay(elementId: string, config: MessageTargetConfig = {}) {
-  const target = useMemo(() => messageDisplay.register(elementId, config), [elementId, config]);
+  const target = useMemo(() => messageDisplay.for(elementId, config), [elementId, config]);
 
   return {
     success: useCallback(

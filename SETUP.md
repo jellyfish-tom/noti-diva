@@ -27,7 +27,7 @@ function MyComponent() {
 import { messageDisplay } from "noti-diva";
 import "noti-diva/dist/styles.css";
 
-const status = messageDisplay.register("my-status", { floating: false });
+const status = messageDisplay.for("my-status", { floating: false });
 status.success("Saved!");
 ```
 
