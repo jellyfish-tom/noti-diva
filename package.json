@@ -15,7 +15,8 @@
         "build:watch": "tsc --watch",
         "copy:css": "cp src/styles.css dist/styles.css",
         "type-check": "tsc --noEmit",
-        "clean": "rm -rf dist"
+        "clean": "rm -rf dist",
+        "prepare": "npm run build"
     },
     "keywords": [
         "message",
