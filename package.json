@@ -1,0 +1,43 @@
+{
+    "name": "noti-diva",
+    "version": "1.0.0",
+    "description": "Framework-agnostic message display library with floating and fixed message support",
+    "main": "dist/index.js",
+    "module": "dist/index.esm.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist",
+        "src",
+        "README.md"
+    ],
+    "scripts": {
+        "build": "npm run clean && tsc && tsc --module ES2020 --outDir dist/esm && npm run copy:css",
+        "build:watch": "tsc --watch",
+        "copy:css": "cp src/styles.css dist/styles.css",
+        "type-check": "tsc --noEmit",
+        "clean": "rm -rf dist"
+    },
+    "keywords": [
+        "message",
+        "notification",
+        "toast",
+        "status",
+        "alert",
+        "ui",
+        "typescript"
+    ],
+    "author": "",
+    "license": "ISC",
+    "peerDependencies": {
+        "ts-pattern": "^5.0.0"
+    },
+    "peerDependenciesMeta": {
+        "ts-pattern": {
+            "optional": false
+        }
+    },
+    "devDependencies": {
+        "@types/node": "^20.11.24",
+        "typescript": "^5.9.2"
+    }
+}
