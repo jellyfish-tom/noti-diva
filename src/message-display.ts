@@ -2,7 +2,12 @@ import { match } from "ts-pattern";
 
 import { STATUS_TYPES, SUCCESS_WORDS } from "./types";
 
-import type { MessageDisplayOptions, MessageTargetConfig, StatusType } from "./types";
+import type {
+  MessageClassNames,
+  MessageDisplayOptions,
+  MessageTargetConfig,
+  StatusType,
+} from "./types";
 
 export class MessageTarget {
   constructor(
@@ -32,7 +37,12 @@ export class MessageTarget {
   }
 
   private show(message: string, type: StatusType, overrides?: Partial<MessageTargetConfig>): void {
-    const config = { ...this.config, ...overrides };
+    const config = {
+      ...this.config,
+      ...overrides,
+      classNames: { ...this.config.classNames, ...(overrides?.classNames ?? {}) },
+      useDefaultClassNames: overrides?.useDefaultClassNames ?? this.config.useDefaultClassNames,
+    };
     this.display.show(message, type, {
       elementId: this.elementId,
       ...config,
@@ -57,6 +67,8 @@ export class MessageDisplay {
       floating: config.floating ?? true,
       duration: config.duration ?? 3000,
       container: config.container ?? (typeof document !== "undefined" ? document.body : undefined!),
+      classNames: config.classNames ?? {},
+      useDefaultClassNames: config.useDefaultClassNames ?? true,
     };
 
     const target = new MessageTarget(this, elementId, defaultConfig);
@@ -70,6 +82,8 @@ export class MessageDisplay {
       duration = 3000,
       elementId,
       container = typeof document !== "undefined" ? document.body : undefined!,
+      classNames = {},
+      useDefaultClassNames = true,
     } = options;
 
     if (typeof document === "undefined") {
@@ -81,14 +95,16 @@ export class MessageDisplay {
     this.logToConsole(processedMessage, type, elementId);
 
     if (floating) {
-      this.showFloatingMessage(processedMessage, type, container, duration);
+      this.showFloatingMessage(processedMessage, type, container, duration, classNames, useDefaultClassNames);
     } else {
       this.showFixedMessage(
         processedMessage,
         type,
         elementId || "status-message",
         container,
-        duration
+        duration,
+        classNames,
+        useDefaultClassNames
       );
     }
   }
@@ -148,14 +164,37 @@ export class MessageDisplay {
       .exhaustive();
   }
 
+  private buildClasses(
+    defaults: string[],
+    useDefaultClassNames: boolean,
+    custom?: string,
+    customType?: string
+  ): string {
+    return [
+      ...(useDefaultClassNames ? defaults : []),
+      custom,
+      customType,
+    ]
+      .filter(Boolean)
+      .join(" ");
+  }
+
   private showFloatingMessage(
     message: string,
     type: StatusType,
     container: HTMLElement,
-    duration: number
+    duration: number,
+    classNames: MessageClassNames,
+    useDefaultClassNames: boolean
   ): void {
     const statusElement = document.createElement("div");
-    statusElement.className = `floating-status-message status-${type}`;
+    const typeClass = classNames.types?.[type];
+    statusElement.className = this.buildClasses(
+      [`floating-status-message`, `status-${type}`],
+      useDefaultClassNames,
+      classNames.floating,
+      typeClass
+    );
 
     const uniqueId = `floating-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     statusElement.id = uniqueId;
@@ -218,18 +257,27 @@ export class MessageDisplay {
     type: StatusType,
     elementId: string,
     container: HTMLElement,
-    duration: number
+    duration: number,
+    classNames: MessageClassNames,
+    useDefaultClassNames: boolean
   ): void {
     let statusElement = document.getElementById(elementId);
 
-    if (!statusElement || !statusElement.classList.contains("status-message")) {
+    if (!statusElement) {
       statusElement = document.createElement("div");
       statusElement.id = elementId;
-      statusElement.className = `status-message status-${type}`;
+      statusElement.dataset["notiDiva"] = "fixed";
       container.appendChild(statusElement);
-    } else {
-      statusElement.className = `status-message status-${type}`;
     }
+
+    const typeClass = classNames.types?.[type];
+    const fixedClasses = this.buildClasses(
+      [`status-message`, `status-${type}`],
+      useDefaultClassNames,
+      classNames.fixed,
+      typeClass
+    );
+    statusElement.className = fixedClasses;
 
     statusElement.textContent = message;
 
@@ -238,8 +286,12 @@ export class MessageDisplay {
       delete this.statusResetTimers[elementId];
     }
 
+    const fadeOutClass = classNames.fadeOut ?? (useDefaultClassNames ? "fade-out" : "");
+
     this.statusResetTimers[elementId] = window.setTimeout(() => {
-      statusElement?.classList.add("fade-out");
+      if (fadeOutClass) {
+        statusElement?.classList.add(fadeOutClass);
+      }
       setTimeout(() => {
         if (statusElement?.parentNode) {
           statusElement.parentNode.removeChild(statusElement);
@@ -253,15 +305,26 @@ export class MessageDisplay {
     message: string,
     type: StatusType,
     container: HTMLElement,
-    options: { useHtml?: boolean } = {}
+    options: { useHtml?: boolean; classNames?: MessageClassNames; useDefaultClassNames?: boolean } = {}
   ): void {
-    const { useHtml = false } = options;
+    const { useHtml = false, classNames = {}, useDefaultClassNames = true } = options;
 
     const wrapper = document.createElement("div");
-    wrapper.className = `data-status ${type}`;
+    const typeClass = classNames.types?.[type];
+    wrapper.className = this.buildClasses(
+      ["data-status", `data-status-${type}`],
+      useDefaultClassNames,
+      classNames.inlineWrapper,
+      typeClass
+    );
 
     const messageElement = document.createElement("div");
-    messageElement.className = "status-message";
+    messageElement.className = this.buildClasses(
+      ["status-message"],
+      useDefaultClassNames,
+      classNames.inlineMessage,
+      typeClass
+    );
 
     if (useHtml) {
       messageElement.innerHTML = message;

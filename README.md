@@ -112,6 +112,21 @@ interface MessageTargetConfig {
   floating?: boolean; // Use floating animation (default: true)
   duration?: number; // Message duration in ms (default: 3000)
   container?: HTMLElement; // Container element (default: document.body)
+  classNames?: MessageClassNames; // Optional custom class names
+  useDefaultClassNames?: boolean; // Keep built-in class names (default: true)
+}
+```
+
+`MessageClassNames` lets you override classes per element/type:
+
+```typescript
+interface MessageClassNames {
+  floating?: string;
+  fixed?: string;
+  types?: Partial<Record<StatusType, string>>;
+  fadeOut?: string;
+  inlineWrapper?: string;
+  inlineMessage?: string;
 }
 ```
 
@@ -123,7 +138,35 @@ interface MessageDisplayOptions {
   duration?: number;
   elementId?: string;
   container?: HTMLElement;
+  classNames?: MessageClassNames;
+  useDefaultClassNames?: boolean;
 }
+```
+
+### Customizing styles with `classNames`
+
+You can attach your own class names (and optionally drop the built-in ones) for full styling control:
+
+```typescript
+const status = messageDisplay.for("my-status", {
+  floating: false,
+  classNames: {
+    fixed: "my-status",
+    floating: "my-floating-status",
+    types: { success: "my-success", error: "my-error" },
+    fadeOut: "my-fade",
+  },
+  useDefaultClassNames: false, // omit default classes if you only want yours
+});
+```
+
+Then style those classes in your app:
+
+```css
+.my-status { /* your styles */ }
+.my-floating-status { /* your styles */ }
+.my-success { /* success styles */ }
+.my-error { /* error styles */ }
 ```
 
 ## Styling

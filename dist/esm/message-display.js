@@ -22,7 +22,12 @@ export class MessageTarget {
         this.show(message, STATUS_TYPES.NEUTRAL, overrides);
     }
     show(message, type, overrides) {
-        const config = { ...this.config, ...overrides };
+        const config = {
+            ...this.config,
+            ...overrides,
+            classNames: { ...this.config.classNames, ...(overrides?.classNames ?? {}) },
+            useDefaultClassNames: overrides?.useDefaultClassNames ?? this.config.useDefaultClassNames,
+        };
         this.display.show(message, type, {
             elementId: this.elementId,
             ...config,
@@ -45,13 +50,15 @@ export class MessageDisplay {
             floating: config.floating ?? true,
             duration: config.duration ?? 3000,
             container: config.container ?? (typeof document !== "undefined" ? document.body : undefined),
+            classNames: config.classNames ?? {},
+            useDefaultClassNames: config.useDefaultClassNames ?? true,
         };
         const target = new MessageTarget(this, elementId, defaultConfig);
         this.registeredTargets.set(elementId, target);
         return target;
     }
     show(message, type, options = {}) {
-        const { floating = true, duration = 3000, elementId, container = typeof document !== "undefined" ? document.body : undefined, } = options;
+        const { floating = true, duration = 3000, elementId, container = typeof document !== "undefined" ? document.body : undefined, classNames = {}, useDefaultClassNames = true, } = options;
         if (typeof document === "undefined") {
             console.warn("MessageDisplay: document is not available. Message not displayed.");
             return;
@@ -59,10 +66,10 @@ export class MessageDisplay {
         const processedMessage = this.processMessage(message, type);
         this.logToConsole(processedMessage, type, elementId);
         if (floating) {
-            this.showFloatingMessage(processedMessage, type, container, duration);
+            this.showFloatingMessage(processedMessage, type, container, duration, classNames, useDefaultClassNames);
         }
         else {
-            this.showFixedMessage(processedMessage, type, elementId || "status-message", container, duration);
+            this.showFixedMessage(processedMessage, type, elementId || "status-message", container, duration, classNames, useDefaultClassNames);
         }
     }
     success(message, options = {}) {
@@ -112,9 +119,19 @@ export class MessageDisplay {
         })
             .exhaustive();
     }
-    showFloatingMessage(message, type, container, duration) {
+    buildClasses(defaults, useDefaultClassNames, custom, customType) {
+        return [
+            ...(useDefaultClassNames ? defaults : []),
+            custom,
+            customType,
+        ]
+            .filter(Boolean)
+            .join(" ");
+    }
+    showFloatingMessage(message, type, container, duration, classNames, useDefaultClassNames) {
         const statusElement = document.createElement("div");
-        statusElement.className = `floating-status-message status-${type}`;
+        const typeClass = classNames.types?.[type];
+        statusElement.className = this.buildClasses([`floating-status-message`, `status-${type}`], useDefaultClassNames, classNames.floating, typeClass);
         const uniqueId = `floating-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
         statusElement.id = uniqueId;
         const randomX = Math.random() * (window.innerWidth - 300);
@@ -155,24 +172,27 @@ export class MessageDisplay {
             animate();
         }, 500);
     }
-    showFixedMessage(message, type, elementId, container, duration) {
+    showFixedMessage(message, type, elementId, container, duration, classNames, useDefaultClassNames) {
         let statusElement = document.getElementById(elementId);
-        if (!statusElement || !statusElement.classList.contains("status-message")) {
+        if (!statusElement) {
             statusElement = document.createElement("div");
             statusElement.id = elementId;
-            statusElement.className = `status-message status-${type}`;
+            statusElement.dataset["notiDiva"] = "fixed";
             container.appendChild(statusElement);
         }
-        else {
-            statusElement.className = `status-message status-${type}`;
-        }
+        const typeClass = classNames.types?.[type];
+        const fixedClasses = this.buildClasses([`status-message`, `status-${type}`], useDefaultClassNames, classNames.fixed, typeClass);
+        statusElement.className = fixedClasses;
         statusElement.textContent = message;
         if (this.statusResetTimers[elementId]) {
             clearTimeout(this.statusResetTimers[elementId]);
             delete this.statusResetTimers[elementId];
         }
+        const fadeOutClass = classNames.fadeOut ?? (useDefaultClassNames ? "fade-out" : "");
         this.statusResetTimers[elementId] = window.setTimeout(() => {
-            statusElement?.classList.add("fade-out");
+            if (fadeOutClass) {
+                statusElement?.classList.add(fadeOutClass);
+            }
             setTimeout(() => {
                 if (statusElement?.parentNode) {
                     statusElement.parentNode.removeChild(statusElement);
@@ -182,11 +202,12 @@ export class MessageDisplay {
         }, duration);
     }
     showInline(message, type, container, options = {}) {
-        const { useHtml = false } = options;
+        const { useHtml = false, classNames = {}, useDefaultClassNames = true } = options;
         const wrapper = document.createElement("div");
-        wrapper.className = `data-status ${type}`;
+        const typeClass = classNames.types?.[type];
+        wrapper.className = this.buildClasses(["data-status", `data-status-${type}`], useDefaultClassNames, classNames.inlineWrapper, typeClass);
         const messageElement = document.createElement("div");
-        messageElement.className = "status-message";
+        messageElement.className = this.buildClasses(["status-message"], useDefaultClassNames, classNames.inlineMessage, typeClass);
         if (useHtml) {
             messageElement.innerHTML = message;
         }

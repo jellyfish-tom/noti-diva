@@ -1,4 +1,4 @@
-import type { MessageDisplayOptions, MessageTargetConfig, StatusType } from "./types";
+import type { MessageClassNames, MessageDisplayOptions, MessageTargetConfig, StatusType } from "./types";
 export declare class MessageTarget {
     private display;
     private elementId;
@@ -24,10 +24,13 @@ export declare class MessageDisplay {
     neutral(message: string, options?: MessageDisplayOptions): void;
     private processMessage;
     private logToConsole;
+    private buildClasses;
     private showFloatingMessage;
     private showFixedMessage;
     showInline(message: string, type: StatusType, container: HTMLElement, options?: {
         useHtml?: boolean;
+        classNames?: MessageClassNames;
+        useDefaultClassNames?: boolean;
     }): void;
     clear(elementId: string): void;
 }

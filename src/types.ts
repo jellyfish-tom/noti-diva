@@ -7,6 +7,15 @@ export const STATUS_TYPES = {
 
 export type StatusType = (typeof STATUS_TYPES)[keyof typeof STATUS_TYPES];
 
+export interface MessageClassNames {
+  floating?: string;
+  fixed?: string;
+  types?: Partial<Record<StatusType, string>>;
+  fadeOut?: string;
+  inlineWrapper?: string;
+  inlineMessage?: string;
+}
+
 export const SUCCESS_WORDS = [
   "Impeccable",
   "Superb",
@@ -42,10 +51,14 @@ export interface MessageDisplayOptions {
   duration?: number;
   elementId?: string;
   container?: HTMLElement;
+  classNames?: MessageClassNames;
+  useDefaultClassNames?: boolean;
 }
 
 export interface MessageTargetConfig {
   floating?: boolean;
   duration?: number;
   container?: HTMLElement;
+  classNames?: MessageClassNames;
+  useDefaultClassNames?: boolean;
 }
