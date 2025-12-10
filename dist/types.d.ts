@@ -21,6 +21,8 @@ export interface MessageDisplayOptions {
     container?: HTMLElement;
     classNames?: MessageClassNames;
     useDefaultClassNames?: boolean;
+    maxWidth?: number | string;
+    ellipsis?: boolean;
 }
 export interface MessageTargetConfig {
     floating?: boolean;
@@ -28,5 +30,7 @@ export interface MessageTargetConfig {
     container?: HTMLElement;
     classNames?: MessageClassNames;
     useDefaultClassNames?: boolean;
+    maxWidth?: number | string;
+    ellipsis?: boolean;
 }
 //# sourceMappingURL=types.d.ts.map

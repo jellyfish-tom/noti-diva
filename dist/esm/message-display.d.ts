@@ -31,6 +31,8 @@ export declare class MessageDisplay {
         useHtml?: boolean;
         classNames?: MessageClassNames;
         useDefaultClassNames?: boolean;
+        maxWidth?: number | string;
+        ellipsis?: boolean;
     }): void;
     clear(elementId: string): void;
 }

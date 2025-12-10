@@ -114,6 +114,8 @@ interface MessageTargetConfig {
   container?: HTMLElement; // Container element (default: document.body)
   classNames?: MessageClassNames; // Optional custom class names
   useDefaultClassNames?: boolean; // Keep built-in class names (default: true)
+  maxWidth?: number | string; // Max width for messages (default: 420)
+  ellipsis?: boolean; // Use text ellipsis (default: false)
 }
 ```
 
@@ -140,6 +142,8 @@ interface MessageDisplayOptions {
   container?: HTMLElement;
   classNames?: MessageClassNames;
   useDefaultClassNames?: boolean;
+  maxWidth?: number | string; // Max width for messages (default: 420)
+  ellipsis?: boolean; // Use text ellipsis (default: false)
 }
 ```
 
@@ -156,6 +160,8 @@ const status = messageDisplay.for("my-status", {
     types: { success: "my-success", error: "my-error" },
     fadeOut: "my-fade",
   },
+  maxWidth: 500, // px or string (e.g., "32rem")
+  ellipsis: true, // opt-in ellipsis; default wraps text
   useDefaultClassNames: false, // omit default classes if you only want yours
 });
 ```

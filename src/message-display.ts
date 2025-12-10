@@ -69,6 +69,8 @@ export class MessageDisplay {
       container: config.container ?? (typeof document !== "undefined" ? document.body : undefined!),
       classNames: config.classNames ?? {},
       useDefaultClassNames: config.useDefaultClassNames ?? true,
+      maxWidth: config.maxWidth ?? 420,
+      ellipsis: config.ellipsis ?? false,
     };
 
     const target = new MessageTarget(this, elementId, defaultConfig);
@@ -84,6 +86,8 @@ export class MessageDisplay {
       container = typeof document !== "undefined" ? document.body : undefined!,
       classNames = {},
       useDefaultClassNames = true,
+      maxWidth = 420,
+      ellipsis = false,
     } = options;
 
     if (typeof document === "undefined") {
@@ -95,7 +99,16 @@ export class MessageDisplay {
     this.logToConsole(processedMessage, type, elementId);
 
     if (floating) {
-      this.showFloatingMessage(processedMessage, type, container, duration, classNames, useDefaultClassNames);
+      this.showFloatingMessage(
+        processedMessage,
+        type,
+        container,
+        duration,
+        classNames,
+        useDefaultClassNames,
+        maxWidth,
+        ellipsis
+      );
     } else {
       this.showFixedMessage(
         processedMessage,
@@ -104,7 +117,9 @@ export class MessageDisplay {
         container,
         duration,
         classNames,
-        useDefaultClassNames
+        useDefaultClassNames,
+        maxWidth,
+        ellipsis
       );
     }
   }
@@ -185,7 +200,9 @@ export class MessageDisplay {
     container: HTMLElement,
     duration: number,
     classNames: MessageClassNames,
-    useDefaultClassNames: boolean
+    useDefaultClassNames: boolean,
+    maxWidth: number | string,
+    ellipsis: boolean
   ): void {
     const statusElement = document.createElement("div");
     const typeClass = classNames.types?.[type];
@@ -202,6 +219,14 @@ export class MessageDisplay {
     const randomX = Math.random() * (window.innerWidth - 300);
     const randomY = Math.random() * (window.innerHeight - 100);
     const randomTilt = (Math.random() - 0.5) * 60;
+
+    const resolvedMaxWidth = typeof maxWidth === "number" ? `${maxWidth}px` : maxWidth;
+    statusElement.style.maxWidth = resolvedMaxWidth;
+    statusElement.style.whiteSpace = ellipsis ? "nowrap" : "normal";
+    statusElement.style.overflow = ellipsis ? "hidden" : "visible";
+    statusElement.style.textOverflow = ellipsis ? "ellipsis" : "unset";
+    statusElement.style.wordBreak = ellipsis ? "normal" : "break-word";
+    statusElement.style.overflowWrap = ellipsis ? "normal" : "anywhere";
 
     statusElement.style.left = `${randomX}px`;
     statusElement.style.top = `${randomY}px`;
@@ -259,7 +284,9 @@ export class MessageDisplay {
     container: HTMLElement,
     duration: number,
     classNames: MessageClassNames,
-    useDefaultClassNames: boolean
+    useDefaultClassNames: boolean,
+    maxWidth: number | string,
+    ellipsis: boolean
   ): void {
     let statusElement = document.getElementById(elementId);
 
@@ -278,6 +305,14 @@ export class MessageDisplay {
       typeClass
     );
     statusElement.className = fixedClasses;
+
+    const resolvedMaxWidth = typeof maxWidth === "number" ? `${maxWidth}px` : maxWidth;
+    statusElement.style.maxWidth = resolvedMaxWidth;
+    statusElement.style.whiteSpace = ellipsis ? "nowrap" : "normal";
+    statusElement.style.overflow = ellipsis ? "hidden" : "visible";
+    statusElement.style.textOverflow = ellipsis ? "ellipsis" : "unset";
+    statusElement.style.wordBreak = ellipsis ? "normal" : "break-word";
+    statusElement.style.overflowWrap = ellipsis ? "normal" : "anywhere";
 
     statusElement.textContent = message;
 
@@ -305,9 +340,21 @@ export class MessageDisplay {
     message: string,
     type: StatusType,
     container: HTMLElement,
-    options: { useHtml?: boolean; classNames?: MessageClassNames; useDefaultClassNames?: boolean } = {}
+    options: {
+      useHtml?: boolean;
+      classNames?: MessageClassNames;
+      useDefaultClassNames?: boolean;
+      maxWidth?: number | string;
+      ellipsis?: boolean;
+    } = {}
   ): void {
-    const { useHtml = false, classNames = {}, useDefaultClassNames = true } = options;
+    const {
+      useHtml = false,
+      classNames = {},
+      useDefaultClassNames = true,
+      maxWidth = 420,
+      ellipsis = false,
+    } = options;
 
     const wrapper = document.createElement("div");
     const typeClass = classNames.types?.[type];
@@ -325,6 +372,14 @@ export class MessageDisplay {
       classNames.inlineMessage,
       typeClass
     );
+
+    const resolvedMaxWidth = typeof maxWidth === "number" ? `${maxWidth}px` : maxWidth;
+    messageElement.style.maxWidth = resolvedMaxWidth;
+    messageElement.style.whiteSpace = ellipsis ? "nowrap" : "normal";
+    messageElement.style.overflow = ellipsis ? "hidden" : "visible";
+    messageElement.style.textOverflow = ellipsis ? "ellipsis" : "unset";
+    messageElement.style.wordBreak = ellipsis ? "normal" : "break-word";
+    messageElement.style.overflowWrap = ellipsis ? "normal" : "anywhere";
 
     if (useHtml) {
       messageElement.innerHTML = message;
