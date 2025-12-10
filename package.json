@@ -1,6 +1,6 @@
 {
     "name": "noti-diva",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "Framework-agnostic message display library with floating and fixed message support",
     "main": "dist/index.js",
     "module": "dist/index.esm.js",
